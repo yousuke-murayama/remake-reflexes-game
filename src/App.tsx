@@ -2,9 +2,13 @@ import { useCallback, useState, type ChangeEvent, type FC } from "react";
 import { StartSection } from "./components/StartSection";
 import { Difficulty } from "./types/sections.interface";
 import { GlobalStyles, styled } from "@mui/material";
+import { PlayingSection } from "./components/PlayingSection";
 
 const App: FC = () => {
   const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.Easy);
+  const [isGameStarted, setIsGameStarted] = useState(false);
+
+  const handleClickStartButton = useCallback(() => setIsGameStarted(true), []);
 
   const handleChangeDifficulty = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -24,10 +28,15 @@ const App: FC = () => {
         }}
       />
       <StyledMain>
-        <StartSection
-          difficulty={difficulty}
-          onChange={handleChangeDifficulty}
-        />
+        {isGameStarted ? (
+          <PlayingSection difficulty={difficulty} />
+        ) : (
+          <StartSection
+            difficulty={difficulty}
+            onChange={handleChangeDifficulty}
+            onClick={handleClickStartButton}
+          />
+        )}
       </StyledMain>
     </>
   );

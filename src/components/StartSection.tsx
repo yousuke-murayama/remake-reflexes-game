@@ -14,9 +14,10 @@ import { Difficulty } from "../types/sections.interface";
 interface Props {
   difficulty: Difficulty;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onClick: () => void;
 }
 
-export const StartSection: FC<Props> = ({ difficulty, onChange }) => {
+export const StartSection: FC<Props> = ({ difficulty, onChange, onClick }) => {
   return (
     <StartSectionContainer>
       <Stack flexDirection="column" spacing={3}>
@@ -33,7 +34,12 @@ export const StartSection: FC<Props> = ({ difficulty, onChange }) => {
           反射神経ゲーム
         </Typography>
 
-        <Button variant="outlined" size="medium" sx={{ alignSelf: "center" }}>
+        <Button
+          variant="outlined"
+          size="medium"
+          sx={{ alignSelf: "center" }}
+          onClick={onClick}
+        >
           START
         </Button>
 
