@@ -47,15 +47,15 @@ export const PlayingSection: FC<Props> = ({ difficulty }) => {
         },
       ]);
       if (created >= 20) {
-        window.clearInterval(timer);
+        clearInterval(timer);
       }
     }, interval);
 
-    return () => window.clearInterval(timer);
+    return () => clearInterval(timer);
   }, [interval]);
 
   return (
-    <PlayingSectionContainer>
+    <>
       <p>現在の得点：{score}</p>
       <Box
         sx={{
@@ -77,20 +77,9 @@ export const PlayingSection: FC<Props> = ({ difficulty }) => {
             ),
         )}
       </Box>
-    </PlayingSectionContainer>
+    </>
   );
 };
-
-const PlayingSectionContainer = styled("div")({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-});
 
 const Target = styled("div", {
   shouldForwardProp: (props) => props !== "position" && props !== "size",

@@ -1,12 +1,19 @@
-import { useCallback, useState, type ChangeEvent, type FC } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type ChangeEvent,
+  type FC,
+} from "react";
 import { StartSection } from "./components/StartSection";
 import { Difficulty } from "./types/sections.interface";
-import { GlobalStyles, styled } from "@mui/material";
+import { Box, GlobalStyles, styled } from "@mui/material";
 import { PlayingSection } from "./components/PlayingSection";
 
 const App: FC = () => {
   const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.Easy);
   const [isGameStarted, setIsGameStarted] = useState(false);
+  const [countDown, setCountDown] = useState(3);
 
   const handleClickStartButton = useCallback(() => setIsGameStarted(true), []);
 
@@ -16,6 +23,20 @@ const App: FC = () => {
     },
     [],
   );
+
+  useEffect(() => {
+    if (!isGameStarted || countDown < 0) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setCountDown((prev) => prev - 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [countDown, isGameStarted]);
 
   return (
     <>
@@ -28,15 +49,29 @@ const App: FC = () => {
         }}
       />
       <StyledMain>
-        {isGameStarted ? (
-          <PlayingSection difficulty={difficulty} />
-        ) : (
-          <StartSection
-            difficulty={difficulty}
-            onChange={handleChangeDifficulty}
-            onClick={handleClickStartButton}
-          />
-        )}
+        <ContentContainer>
+          {isGameStarted ? (
+            countDown < 0 ? (
+              <PlayingSection difficulty={difficulty} />
+            ) : (
+              <Box
+                sx={{
+                  textAlign: "center",
+                  fontSize: "1.5rem",
+                }}
+              >
+                <p>黒丸●をクリックしてください。</p>
+                <p>{countDown === 0 ? "START!!" : countDown}</p>
+              </Box>
+            )
+          ) : (
+            <StartSection
+              difficulty={difficulty}
+              onChange={handleChangeDifficulty}
+              onClick={handleClickStartButton}
+            />
+          )}
+        </ContentContainer>
       </StyledMain>
     </>
   );
@@ -46,6 +81,17 @@ const StyledMain = styled("main")({
   display: "flex",
   minHeight: "100vh",
   flexDirection: "column",
+});
+
+const ContentContainer = styled("div")({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
 });
 
 export default App;
