@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FC } from "react";
+import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { Difficulty, type Target } from "../types/sections.interface";
 import { Box, styled } from "@mui/material";
 
@@ -8,16 +8,26 @@ interface Props {
 
 export const PlayingSection: FC<Props> = ({ difficulty }) => {
   const [targets, setTargets] = useState<Target[]>([]);
+  const [score, setScore] = useState(0);
 
   const interval = useMemo(() => {
     if (difficulty === Difficulty.Easy) {
-      return 1200;
+      return 3000;
     }
     if (difficulty === Difficulty.Normal) {
       return 1000;
     }
     return 750;
   }, [difficulty]);
+
+  const handleClickTarget = useCallback((targetId: number) => {
+    setScore((prev) => prev + 1);
+    setTargets((prev) =>
+      prev.map((target) =>
+        target.id === targetId ? { ...target, isDisplay: false } : target,
+      ),
+    );
+  }, []);
 
   useEffect(() => {
     let created = 0;
@@ -46,6 +56,7 @@ export const PlayingSection: FC<Props> = ({ difficulty }) => {
 
   return (
     <PlayingSectionContainer>
+      <p>現在の得点：{score}</p>
       <Box
         sx={{
           border: "1px solid black",
@@ -57,18 +68,11 @@ export const PlayingSection: FC<Props> = ({ difficulty }) => {
         {targets.map(
           (target) =>
             target.isDisplay && (
-              <Box
+              <Target
                 key={target.id}
-                sx={{
-                  position: "absolute",
-                  left: `${target.position.x}%`,
-                  top: `${target.position.y}%`,
-                  width: `${target.size}px`,
-                  height: `${target.size}px`,
-                  borderRadius: "50%",
-                  backgroundColor: "black",
-                  cursor: "pointer",
-                }}
+                onClick={() => handleClickTarget(target.id)}
+                position={target.position}
+                size={target.size}
               />
             ),
         )}
@@ -87,3 +91,16 @@ const PlayingSectionContainer = styled("div")({
   left: "50%",
   transform: "translate(-50%, -50%)",
 });
+
+const Target = styled("div", {
+  shouldForwardProp: (props) => props !== "position" && props !== "size",
+})<Pick<Target, "position" | "size">>(({ position, size }) => ({
+  position: "absolute",
+  left: `${position.x}%`,
+  top: `${position.y}%`,
+  width: `${size}px`,
+  height: `${size}px`,
+  borderRadius: "50%",
+  backgroundColor: "black",
+  cursor: "pointer",
+}));
