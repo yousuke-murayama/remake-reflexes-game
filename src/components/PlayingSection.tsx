@@ -37,7 +37,7 @@ export const PlayingSection: FC<Props> = ({ difficulty }) => {
           id: clickedTarget.id,
           position: {
             x: clickedTarget.position.x + 4,
-            y: clickedTarget.position.y + 4,
+            y: clickedTarget.position.y - 4,
           },
           visible: true,
         },
