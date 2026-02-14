@@ -49,7 +49,7 @@ const App: FC = () => {
         }}
       />
       <StyledMain>
-        <ContentContainer>
+        <SectionContainer>
           {isGameStarted ? (
             countDown < 0 ? (
               <PlayingSection difficulty={difficulty} />
@@ -71,7 +71,7 @@ const App: FC = () => {
               onClick={handleClickStartButton}
             />
           )}
-        </ContentContainer>
+        </SectionContainer>
       </StyledMain>
     </>
   );
@@ -83,7 +83,7 @@ const StyledMain = styled("main")({
   flexDirection: "column",
 });
 
-const ContentContainer = styled("div")({
+const SectionContainer = styled("div")({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",

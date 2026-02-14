@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useState, type FC } from "react";
-import { Difficulty, type Target } from "../types/sections.interface";
-import { Box, styled } from "@mui/material";
+import {
+  Difficulty,
+  type PlusEffect,
+  type Target,
+} from "../types/sections.interface";
+import { Box, Fade, styled, Typography } from "@mui/material";
 
 interface Props {
   difficulty: Difficulty;
@@ -8,26 +12,62 @@ interface Props {
 
 export const PlayingSection: FC<Props> = ({ difficulty }) => {
   const [targets, setTargets] = useState<Target[]>([]);
+  const [plusEffects, setPlusEffects] = useState<PlusEffect[]>([]);
   const [score, setScore] = useState(0);
+
+  console.log(plusEffects);
 
   const interval = useMemo(() => {
     if (difficulty === Difficulty.Easy) {
-      return 3000;
+      return 2000;
     }
     if (difficulty === Difficulty.Normal) {
-      return 1000;
+      return 1500;
     }
-    return 750;
+    return 1000;
   }, [difficulty]);
 
-  const handleClickTarget = useCallback((targetId: number) => {
-    setScore((prev) => prev + 1);
-    setTargets((prev) =>
-      prev.map((target) =>
-        target.id === targetId ? { ...target, isDisplay: false } : target,
-      ),
-    );
-  }, []);
+  const handleClickTarget = useCallback(
+    (targetId: number) => {
+      const clickedTarget = targets.find((target) => target.id === targetId)!;
+
+      setPlusEffects((prev) => [
+        ...prev,
+        {
+          id: clickedTarget.id,
+          position: {
+            x: clickedTarget.position.x + 4,
+            y: clickedTarget.position.y + 4,
+          },
+          visible: true,
+        },
+      ]);
+
+      setScore((prev) => prev + 1);
+
+      setTargets((prev) =>
+        prev.map((target) =>
+          target.id === targetId ? { ...target, visible: false } : target,
+        ),
+      );
+
+      // NOTE: 1秒後にフェードアウトさせる
+      setTimeout(() => {
+        setPlusEffects((prev) =>
+          prev.map((effect) =>
+            effect.id === targetId ? { ...effect, visible: false } : effect,
+          ),
+        );
+      }, 1000);
+
+      setTimeout(() => {
+        setPlusEffects((prev) =>
+          prev.filter((effect) => effect.id !== targetId),
+        );
+      }, 2000);
+    },
+    [targets],
+  );
 
   useEffect(() => {
     let created = 0;
@@ -35,7 +75,7 @@ export const PlayingSection: FC<Props> = ({ difficulty }) => {
     const timer = setInterval(() => {
       created += 1;
       setTargets((prev) => [
-        ...prev.map((target) => ({ ...target, isDisplay: false })),
+        ...prev.map((target) => ({ ...target, visible: false })),
         {
           id: created,
           position: {
@@ -43,7 +83,7 @@ export const PlayingSection: FC<Props> = ({ difficulty }) => {
             y: Math.floor(Math.random() * 96),
           },
           size: Math.floor(Math.random() * 41) + 10,
-          isDisplay: true,
+          visible: true,
         },
       ]);
       if (created >= 20) {
@@ -67,7 +107,7 @@ export const PlayingSection: FC<Props> = ({ difficulty }) => {
       >
         {targets.map(
           (target) =>
-            target.isDisplay && (
+            target.visible && (
               <Target
                 key={target.id}
                 onClick={() => handleClickTarget(target.id)}
@@ -76,6 +116,31 @@ export const PlayingSection: FC<Props> = ({ difficulty }) => {
               />
             ),
         )}
+        {plusEffects.map((effect) => (
+          <Fade
+            key={effect.id}
+            in={effect.visible}
+            timeout={{
+              enter: 1000,
+              exit: 1000,
+            }}
+          >
+            <Typography
+              sx={{
+                position: "absolute",
+                left: `${effect.position.x}%`,
+                top: `${effect.position.y}%`,
+                fontWeight: 700,
+                fontSize: "1.5rem",
+                color: "#1a10da",
+                pointerEvents: "none",
+                userSelect: "none",
+              }}
+            >
+              +1
+            </Typography>
+          </Fade>
+        ))}
       </Box>
     </>
   );

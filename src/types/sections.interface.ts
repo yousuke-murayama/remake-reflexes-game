@@ -13,5 +13,14 @@ export interface Target {
     y: number;
   };
   size: number;
-  isDisplay: boolean;
+  visible: boolean;
+}
+
+export interface PlusEffect {
+  id: number;
+  position: {
+    x: number;
+    y: number;
+  };
+  visible: boolean;
 }
