@@ -8,14 +8,14 @@ import { Box, Fade, styled, Typography } from "@mui/material";
 
 interface Props {
   difficulty: Difficulty;
+  countDown: number;
 }
 
-export const PlayingSection: FC<Props> = ({ difficulty }) => {
+export const PlayingSection: FC<Props> = ({ difficulty, countDown }) => {
   const [targets, setTargets] = useState<Target[]>([]);
   const [plusEffects, setPlusEffects] = useState<PlusEffect[]>([]);
   const [score, setScore] = useState(0);
-
-  console.log(plusEffects);
+  const [finished, setFinished] = useState(false);
 
   const interval = useMemo(() => {
     if (difficulty === Difficulty.Easy) {
@@ -70,6 +70,10 @@ export const PlayingSection: FC<Props> = ({ difficulty }) => {
   );
 
   useEffect(() => {
+    if (countDown >= 0) {
+      return;
+    }
+
     let created = 0;
 
     const timer = setInterval(() => {
@@ -88,61 +92,98 @@ export const PlayingSection: FC<Props> = ({ difficulty }) => {
       ]);
       if (created >= 20) {
         clearInterval(timer);
+        setTimeout(() => setFinished(true), 3000);
       }
     }, interval);
 
     return () => clearInterval(timer);
-  }, [interval]);
+  }, [interval, countDown]);
 
   return (
-    <>
-      <p>現在の得点：{score}</p>
-      <Box
-        sx={{
-          border: "1px solid black",
-          width: "1280px",
-          height: "700px",
-          position: "relative",
-        }}
-      >
-        {targets.map(
-          (target) =>
-            target.visible && (
-              <Target
-                key={target.id}
-                onClick={() => handleClickTarget(target.id)}
-                position={target.position}
-                size={target.size}
-              />
-            ),
-        )}
-        {plusEffects.map((effect) => (
-          <Fade
-            key={effect.id}
-            in={effect.visible}
-            timeout={{
-              enter: 1000,
-              exit: 1000,
-            }}
-          >
-            <Typography
-              sx={{
-                position: "absolute",
-                left: `${effect.position.x}%`,
-                top: `${effect.position.y}%`,
-                fontWeight: 700,
-                fontSize: "1.5rem",
-                color: "#1a10da",
-                pointerEvents: "none",
-                userSelect: "none",
+    <Box
+      sx={{
+        border: "1px solid black",
+        width: "1280px",
+        height: "700px",
+        position: "relative",
+      }}
+    >
+      {countDown >= 0 ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            textAlign: "center",
+            fontSize: "1.5rem",
+          }}
+        >
+          <p>黒丸●をクリックしてください。</p>
+          <p>{countDown === 0 ? "START!!" : countDown}</p>
+        </Box>
+      ) : !finished ? (
+        <>
+          {targets.map(
+            (target) =>
+              target.visible && (
+                <Target
+                  key={target.id}
+                  onClick={() => handleClickTarget(target.id)}
+                  position={target.position}
+                  size={target.size}
+                />
+              ),
+          )}
+          {plusEffects.map((effect) => (
+            <Fade
+              key={effect.id}
+              in={effect.visible}
+              timeout={{
+                enter: 1000,
+                exit: 1000,
               }}
             >
-              +1
-            </Typography>
-          </Fade>
-        ))}
-      </Box>
-    </>
+              <Typography
+                sx={{
+                  position: "absolute",
+                  left: `${effect.position.x}%`,
+                  top: `${effect.position.y}%`,
+                  fontWeight: 700,
+                  fontSize: "1.5rem",
+                  color: "#1a10da",
+                  pointerEvents: "none",
+                  userSelect: "none",
+                }}
+              >
+                +1
+              </Typography>
+            </Fade>
+          ))}
+        </>
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            textAlign: "center",
+            fontSize: "1.5rem",
+          }}
+        >
+          <p>あなたの得点は{score}/20点です。</p>
+        </Box>
+      )}
+    </Box>
   );
 };
 

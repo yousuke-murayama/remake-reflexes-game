@@ -7,7 +7,7 @@ import {
 } from "react";
 import { StartSection } from "./components/StartSection";
 import { Difficulty } from "./types/sections.interface";
-import { Box, GlobalStyles, styled } from "@mui/material";
+import { GlobalStyles, styled } from "@mui/material";
 import { PlayingSection } from "./components/PlayingSection";
 
 const App: FC = () => {
@@ -51,19 +51,7 @@ const App: FC = () => {
       <StyledMain>
         <SectionContainer>
           {isGameStarted ? (
-            countDown < 0 ? (
-              <PlayingSection difficulty={difficulty} />
-            ) : (
-              <Box
-                sx={{
-                  textAlign: "center",
-                  fontSize: "1.5rem",
-                }}
-              >
-                <p>黒丸●をクリックしてください。</p>
-                <p>{countDown === 0 ? "START!!" : countDown}</p>
-              </Box>
-            )
+            <PlayingSection difficulty={difficulty} countDown={countDown} />
           ) : (
             <StartSection
               difficulty={difficulty}
