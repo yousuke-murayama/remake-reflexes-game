@@ -4,14 +4,19 @@ import {
   type PlusEffect,
   type Target,
 } from "../types/sections.interface";
-import { Box, Fade, styled, Typography } from "@mui/material";
+import { Box, Button, Fade, styled, Typography } from "@mui/material";
 
 interface Props {
   difficulty: Difficulty;
   countDown: number;
+  onClick: () => void;
 }
 
-export const PlayingSection: FC<Props> = ({ difficulty, countDown }) => {
+export const PlayingSection: FC<Props> = ({
+  difficulty,
+  countDown,
+  onClick,
+}) => {
   const [targets, setTargets] = useState<Target[]>([]);
   const [plusEffects, setPlusEffects] = useState<PlusEffect[]>([]);
   const [score, setScore] = useState(0);
@@ -68,6 +73,14 @@ export const PlayingSection: FC<Props> = ({ difficulty, countDown }) => {
     },
     [targets],
   );
+
+  const handleClickRetryButton = useCallback(() => {
+    onClick();
+    setScore(0);
+    setPlusEffects([]);
+    setTargets([]);
+    setFinished(false);
+  }, [onClick]);
 
   useEffect(() => {
     if (countDown >= 0) {
@@ -181,6 +194,14 @@ export const PlayingSection: FC<Props> = ({ difficulty, countDown }) => {
           }}
         >
           <p>あなたの得点は{score}/20点です。</p>
+          <Button
+            variant="outlined"
+            color="inherit"
+            size="medium"
+            onClick={handleClickRetryButton}
+          >
+            もう一回
+          </Button>
         </Box>
       )}
     </Box>

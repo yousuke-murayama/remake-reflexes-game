@@ -24,6 +24,8 @@ const App: FC = () => {
     [],
   );
 
+  const handleClickRetryButton = useCallback(() => setCountDown(3), []);
+
   useEffect(() => {
     if (!isGameStarted || countDown < 0) {
       return;
@@ -51,7 +53,11 @@ const App: FC = () => {
       <StyledMain>
         <SectionContainer>
           {isGameStarted ? (
-            <PlayingSection difficulty={difficulty} countDown={countDown} />
+            <PlayingSection
+              difficulty={difficulty}
+              countDown={countDown}
+              onClick={handleClickRetryButton}
+            />
           ) : (
             <StartSection
               difficulty={difficulty}
