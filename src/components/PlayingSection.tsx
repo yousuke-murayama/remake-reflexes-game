@@ -4,7 +4,7 @@ import {
   type PlusEffect,
   type Target,
 } from "../types/sections.interface";
-import { Box, Button, Fade, styled, Typography } from "@mui/material";
+import { Box, Button, Fade, Stack, styled, Typography } from "@mui/material";
 
 interface Props {
   difficulty: Difficulty;
@@ -20,7 +20,7 @@ export const PlayingSection: FC<Props> = ({
   const [targets, setTargets] = useState<Target[]>([]);
   const [plusEffects, setPlusEffects] = useState<PlusEffect[]>([]);
   const [score, setScore] = useState(0);
-  const [finished, setFinished] = useState(false);
+  const [showResult, setShowResult] = useState(false);
 
   const interval = useMemo(() => {
     if (difficulty === Difficulty.Easy) {
@@ -79,8 +79,13 @@ export const PlayingSection: FC<Props> = ({
     setScore(0);
     setPlusEffects([]);
     setTargets([]);
-    setFinished(false);
+    setShowResult(false);
   }, [onClick]);
+
+  const handleClickFinishButton = useCallback(
+    () => window.location.reload(),
+    [],
+  );
 
   useEffect(() => {
     if (countDown >= 0) {
@@ -105,7 +110,7 @@ export const PlayingSection: FC<Props> = ({
       ]);
       if (created >= 20) {
         clearInterval(timer);
-        setTimeout(() => setFinished(true), 3000);
+        setTimeout(() => setShowResult(true), 3000);
       }
     }, interval);
 
@@ -139,7 +144,7 @@ export const PlayingSection: FC<Props> = ({
           <p>黒丸●をクリックしてください。</p>
           <p>{countDown === 0 ? "START!!" : countDown}</p>
         </Box>
-      ) : !finished ? (
+      ) : !showResult ? (
         <>
           {targets.map(
             (target) =>
@@ -191,17 +196,33 @@ export const PlayingSection: FC<Props> = ({
             transform: "translate(-50%, -50%)",
             textAlign: "center",
             fontSize: "1.5rem",
+            gap: "16px",
           }}
         >
           <p>あなたの得点は{score}/20点です。</p>
-          <Button
-            variant="outlined"
-            color="inherit"
-            size="medium"
-            onClick={handleClickRetryButton}
+          <Stack
+            flexDirection="row"
+            alignItems="center"
+            gap={1}
+            justifyContent="center"
           >
-            もう一回
-          </Button>
+            <Button
+              variant="outlined"
+              color="inherit"
+              size="medium"
+              onClick={handleClickRetryButton}
+            >
+              もう一回
+            </Button>
+            <Button
+              variant="outlined"
+              color="inherit"
+              size="medium"
+              onClick={handleClickFinishButton}
+            >
+              終了
+            </Button>
+          </Stack>
         </Box>
       )}
     </Box>
